@@ -11,10 +11,15 @@ public final class MoarItems extends JavaPlugin {
     public static final String SONIC_CHARGE_DESC_1 = "Set off to give nearby players";
     public static final String SONIC_CHARGE_DESC_2 = "echolocation for a short time";
 
+    public static final String RADAR_NAME = "Radar";
+    public static final String RADAR_DESC = "Sneak to reveal nearby entities";
+
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new MoarItemsListener(), this);
-        getCommand("givesoniccharge").setExecutor(new MoarItemsCommandExecutor(this));
+        MoarItemsCommandExecutor commandExecutor = new MoarItemsCommandExecutor(this);
+        getCommand("givesoniccharge").setExecutor(commandExecutor);
+        getCommand("giveradar").setExecutor(commandExecutor);
     }
 
     @Override
