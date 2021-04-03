@@ -1,0 +1,11 @@
+  name: MoarItems
+  main: com.github.byrnorthil.moaritems.MoarItems
+  version: 1.0-SNAPSHOT
+  api-version: 1.16
+
+  commands:
+    givesoniccharge:
+      description: Gives a sonic charge
+      usage: /<command>
+      permission: <plugin name>.basic
+      permission-message: You don't have <permission>
