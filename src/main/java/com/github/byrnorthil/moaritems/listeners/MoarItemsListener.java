@@ -1,5 +1,6 @@
 package com.github.byrnorthil.moaritems.listeners;
 
+import com.destroystokyo.paper.MaterialTags;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -21,8 +22,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.github.byrnorthil.moaritems.MoarItems.isRadar;
-import static com.github.byrnorthil.moaritems.MoarItems.isSonicChargeMeta;
+import static com.github.byrnorthil.moaritems.MoarItems.*;
 
 public class MoarItemsListener implements Listener {
     @EventHandler
@@ -56,13 +56,12 @@ public class MoarItemsListener implements Listener {
 
             //if main-hand isn't radar, try offhand
             ItemStack item = player.getInventory().getItemInMainHand();
-            boolean offHand = false;
-            if (!isRadar(item)) {
+            if (isRadar(item)) player.swingMainHand();
+            else {
+                if (event.isBlockInHand() || isUsableItem(item)) return;
                 item = player.getInventory().getItemInOffHand();
-                offHand = true;
-                if (!isRadar(item)) {
-                    return;
-                }
+                if (!isRadar(item)) return;
+                player.swingOffHand();
             }
 
             //Give glowing and play sound
@@ -78,11 +77,6 @@ public class MoarItemsListener implements Listener {
             //We need an extra call to playSound because getNearbyEntities doesn't include the calling player
             player.playSound(player.getLocation(), "block.enchantment_table.use", 1f, 1.5f);
             player.spawnParticle(Particle.SPELL_INSTANT, player.getLocation(), 25);
-            if (offHand) {
-                player.swingOffHand();
-            } else {
-                player.swingMainHand();
-            }
             event.setUseItemInHand(Event.Result.DENY);
             event.setCancelled(true);
         }

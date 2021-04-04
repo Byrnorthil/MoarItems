@@ -1,10 +1,13 @@
 package com.github.byrnorthil.moaritems;
 
+import com.destroystokyo.paper.MaterialSetTag;
+import com.destroystokyo.paper.MaterialTags;
 import com.github.byrnorthil.moaritems.commands.MoarItemsCommandExecutor;
 import com.github.byrnorthil.moaritems.listeners.MoarItemsListener;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -69,5 +72,13 @@ public final class MoarItems extends JavaPlugin {
 
     public static boolean isRadarMeta(ItemMeta meta) {
         return Objects.equals(meta.lore(), List.of(Component.text(RADAR_DESC)));
+    }
+
+    public static boolean isUsableItem(ItemStack item) { //Doesn't include blocks
+        return item.getType().isEdible()
+                || MaterialTags.BOWS.isTagged(item)
+                || MaterialTags.THROWABLE_PROJECTILES.isTagged(item)
+                || item.getType() == Material.FISHING_ROD
+                || item.getType() == Material.SHIELD;
     }
 }
