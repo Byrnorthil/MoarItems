@@ -1,64 +1,90 @@
 package com.github.byrnorthil.moaritems.listeners;
 
-import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Entity;
+import org.bukkit.Particle;
+import org.bukkit.conversations.Conversation;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.FireworkExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
-import static com.github.byrnorthil.moaritems.MoarItems.*;
+import static com.github.byrnorthil.moaritems.MoarItems.isRadar;
+import static com.github.byrnorthil.moaritems.MoarItems.isSonicChargeMeta;
 
 public class MoarItemsListener implements Listener {
     @EventHandler
     public void onFireWorkExplode(FireworkExplodeEvent event) {
         Firework firework = event.getEntity();
-        FireworkMeta fireworkMeta = firework.getFireworkMeta();
-        if (Objects.equals(fireworkMeta.displayName(), Component.text(SONIC_CHARGE_NAME))
-            && Objects.equals(fireworkMeta.lore(), List.of(Component.text(SONIC_CHARGE_DESC_1), Component.text(SONIC_CHARGE_DESC_2)))
-            && fireworkMeta.getPower() == 2) {
-            for (Entity entity : firework.getNearbyEntities(96, 144, 96)) {
-                if (entity instanceof LivingEntity) {
-                    ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 160, 1));
+        if (isSonicChargeMeta(firework.getFireworkMeta())) {
+            //give things glowing and play sounds for players
+            firework.getNearbyEntities(96, 144, 96).stream()
+                    .filter(entity -> entity instanceof LivingEntity)
+                    .forEach(entity -> {
+                ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 160, 1));
+                if (entity instanceof Player) {
+                    ((Player) entity).playSound(firework.getLocation(), "block.beacon.activate", 6f, 0.8f);
                 }
-            }
+            });
 
-            for (Entity entity : firework.getNearbyEntities(16, 64, 16)) {
-                if (entity instanceof LivingEntity) {
-                    ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 160, 1));
-                }
-            }
+            //Give things night-vision
+            firework.getNearbyEntities(16, 64, 16).stream()
+                    .filter(entity -> entity instanceof LivingEntity)
+                    .forEach(entity -> ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 160, 1)));
+            //TODO: Add particles
         }
     }
 
     @EventHandler
     public void onPlayerClick(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        ItemStack item = player.getInventory().getItemInMainHand();
         if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)
-            && !player.hasCooldown(Material.CLOCK)
-            && item.getType() == Material.CLOCK
-            && Objects.equals(item.getItemMeta().displayName(), Component.text(RADAR_NAME))
-            && Objects.equals(item.getItemMeta().lore(), List.of(Component.text(RADAR_DESC)))) {
-                for (Entity entity: player.getNearbyEntities(48, 48, 48)) {
-                    if (entity != player && entity instanceof LivingEntity) {
-                        ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.GLOWING,
-                                20, 1, false, false, true));
-                    }
+                && !player.hasCooldown(Material.CLOCK)
+                && !player.isHandRaised()) {
+
+            //if main-hand isn't radar, try offhand
+            ItemStack item = player.getInventory().getItemInMainHand();
+            boolean offHand = false;
+            if (!isRadar(item)) {
+                item = player.getInventory().getItemInOffHand();
+                offHand = true;
+                if (!isRadar(item)) {
+                    return;
                 }
-                player.setCooldown(Material.CLOCK, 80);
+            }
+
+            //Give glowing and play sound
+            player.getNearbyEntities(48, 48, 48).stream()
+                    .filter(entity -> entity instanceof LivingEntity).forEach(entity -> {
+                ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.GLOWING,
+                        20, 1, false, false, true));
+                if (entity instanceof Player) {
+                    ((Player) entity).playSound(player.getLocation(), "block.enchantment_table.use", 1f, 1.5f);
+                }
+            });
+            player.setCooldown(Material.CLOCK, 80);
+            //We need an extra call to playSound because getNearbyEntities doesn't include the calling player
+            player.playSound(player.getLocation(), "block.enchantment_table.use", 1f, 1.5f);
+            player.spawnParticle(Particle.SPELL_INSTANT, player.getLocation(), 25);
+            if (offHand) {
+                player.swingOffHand();
+            } else {
+                player.swingMainHand();
+            }
+            event.setUseItemInHand(Event.Result.DENY);
+            event.setCancelled(true);
         }
     }
 }
