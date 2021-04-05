@@ -4,8 +4,8 @@
   api-version: 1.16
 
   commands:
-    givesoniccharge:
-      description: Gives a sonic charge
+    giveglitterbomb:
+      description: Gives a glitter bomb
       usage: /<command>
       permission: <plugin name>.basic
       permission-message: You don't have <permission>

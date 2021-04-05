@@ -16,29 +16,33 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import static com.github.byrnorthil.moaritems.MoarItems.*;
 
 public class MoarItemsListener implements Listener {
     @EventHandler
     public void onFireWorkExplode(FireworkExplodeEvent event) {
-        ItemStack sonicChargeTemplate = makeSonicCharge();
+        ItemStack sonicChargeTemplate = makeGlitterBomb();
         Firework firework = event.getEntity();
         if (metaMatch(firework.getFireworkMeta(), sonicChargeTemplate.getItemMeta())) {
-            //give things glowing and play sounds for players
-            firework.getNearbyEntities(96, 144, 96).stream()
-                    .filter(entity -> entity instanceof LivingEntity)
+            //give things glowing and play sounds and particles for players
+            firework.getNearbyEntities(96, 96, 96).stream()
+                    .filter(entity -> entity instanceof LivingEntity
+                            && ((LivingEntity) entity).hasLineOfSight(firework))
                     .forEach(entity -> {
                 ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 160, 1));
+                //have to be standing underneath the firework to get nighvision
+                if (firework.getNearbyEntities(16, 64, 16).contains(entity)) {
+                    ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 160, 1));
+                }
                 if (entity instanceof Player) {
+                    ((Player) entity).spawnParticle(Particle.FIREWORKS_SPARK, firework.getLocation(), 300);
+                    //TODO: Make better sound
                     ((Player) entity).playSound(firework.getLocation(), "block.beacon.activate", 6f, 0.8f);
                 }
             });
-
-            //Give things night-vision
-            firework.getNearbyEntities(16, 64, 16).stream()
-                    .filter(entity -> entity instanceof LivingEntity)
-                    .forEach(entity -> ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 160, 1)));
-            //TODO: Add particles
         }
     }
 
@@ -56,6 +60,12 @@ public class MoarItemsListener implements Listener {
         //If the item isn't a radar, we don't need to do anything else
         ItemStack item = event.getItem();
         if (item == null || !metaMatch(radarTemplate.getItemMeta(), item.getItemMeta())) return;
+
+        if (event.getHand() == EquipmentSlot.HAND) {
+            player.swingMainHand();
+        } else {
+            player.swingOffHand();
+        }
 
         //TODO: Find some way to override off-hand item if radar is used in main hand
         event.setUseItemInHand(Event.Result.ALLOW);

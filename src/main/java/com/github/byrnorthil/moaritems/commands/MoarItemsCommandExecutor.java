@@ -1,17 +1,11 @@
 package com.github.byrnorthil.moaritems.commands;
 
 import com.github.byrnorthil.moaritems.MoarItems;
-import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.FireworkMeta;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 import static com.github.byrnorthil.moaritems.MoarItems.*;
 
@@ -29,9 +23,9 @@ public class MoarItemsCommandExecutor implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
 
         switch (command.getName()) {
-            case "givesoniccharge":
+            case "giveglitterbomb":
                 if (commandSender instanceof InventoryHolder) {
-                    ((InventoryHolder) commandSender).getInventory().addItem(makeSonicCharge());
+                    ((InventoryHolder) commandSender).getInventory().addItem(makeGlitterBomb());
                     return true;
                 } else {
                     commandSender.sendMessage(INVALID_SENDER);
