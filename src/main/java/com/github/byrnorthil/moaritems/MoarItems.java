@@ -11,7 +11,9 @@ import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
 
@@ -49,14 +51,6 @@ public final class MoarItems extends JavaPlugin {
         return sonicCharge;
     }
 
-    public static boolean isSonicCharge(ItemStack item) {
-        return item.getType() == Material.FIREWORK_ROCKET && isSonicChargeMeta(item.getItemMeta());
-    }
-
-    public static boolean isSonicChargeMeta(ItemMeta meta) {
-        return Objects.equals(meta.lore(), List.of(Component.text(SONIC_CHARGE_DESC_1), Component.text(SONIC_CHARGE_DESC_2)));
-    }
-
     public static ItemStack makeRadar() {
         ItemStack radar = new ItemStack(Material.CLOCK);
         ItemMeta meta = radar.getItemMeta();
@@ -66,15 +60,14 @@ public final class MoarItems extends JavaPlugin {
         return radar;
     }
 
-    public static boolean isRadar(ItemStack item) {
-        return item.getType() == Material.CLOCK && isRadarMeta(item.getItemMeta());
+    public static boolean metaMatch(@Nullable ItemMeta meta1, @Nullable ItemMeta meta2) {
+        if (meta1 == null && meta2 == null) return true;
+        if ((meta1 == null) != (meta2 == null)) return false; //XOR
+        return Objects.equals(meta1.lore(), meta2.lore()); //Match item metas by lore only, to be more adjustable
     }
 
-    public static boolean isRadarMeta(ItemMeta meta) {
-        return Objects.equals(meta.lore(), List.of(Component.text(RADAR_DESC)));
-    }
-
-    public static boolean isUsableItem(ItemStack item) { //Doesn't include blocks
+    public static boolean isUsableItem(@Nullable ItemStack item) { //Doesn't include blocks
+        if (item == null) return false;
         return item.getType().isEdible()
                 || MaterialTags.BOWS.isTagged(item)
                 || MaterialTags.THROWABLE_PROJECTILES.isTagged(item)
