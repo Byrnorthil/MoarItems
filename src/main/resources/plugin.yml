@@ -6,11 +6,11 @@
   commands:
     giveglitterbomb:
       description: Gives a glitter bomb
-      usage: /<command>
+      usage: /<command> [player]
       permission: <plugin name>.basic
       permission-message: You don't have <permission>
     giveradar:
       description: Gives a radar
-      usage: /<command>
+      usage: /<command> [player]
       permission: <plugin name>.basic
       permission-message: You don't have <permission>

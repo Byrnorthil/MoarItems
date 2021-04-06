@@ -1,7 +1,7 @@
 package com.github.byrnorthil.moaritems.listeners;
 
-import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -16,9 +16,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 import static com.github.byrnorthil.moaritems.MoarItems.*;
 
 public class MoarItemsListener implements Listener {
@@ -27,20 +24,22 @@ public class MoarItemsListener implements Listener {
         ItemStack sonicChargeTemplate = makeGlitterBomb();
         Firework firework = event.getEntity();
         if (metaMatch(firework.getFireworkMeta(), sonicChargeTemplate.getItemMeta())) {
-            //give things glowing and play sounds and particles for players
+            //nearby entities
             firework.getNearbyEntities(96, 96, 96).stream()
                     .filter(entity -> entity instanceof LivingEntity
                             && ((LivingEntity) entity).hasLineOfSight(firework))
                     .forEach(entity -> {
-                ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 160, 1));
+                ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 160, 0));
                 //have to be standing underneath the firework to get nighvision
                 if (firework.getNearbyEntities(16, 64, 16).contains(entity)) {
-                    ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 160, 1));
+                    ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 160, 0));
+                    if (firework.getNearbyEntities(4, 4, 4).contains(entity)) {
+                        ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 160, 0));
+                    }
+
                 }
-                if (entity instanceof Player) {
+                if (entity instanceof Player) { //additional glitter spray effect
                     ((Player) entity).spawnParticle(Particle.FIREWORKS_SPARK, firework.getLocation(), 300);
-                    //TODO: Make better sound
-                    ((Player) entity).playSound(firework.getLocation(), "block.beacon.activate", 6f, 0.8f);
                 }
             });
         }
@@ -74,14 +73,14 @@ public class MoarItemsListener implements Listener {
         player.getNearbyEntities(48, 48, 48).stream()
                 .filter(entity -> entity instanceof LivingEntity).forEach(entity -> {
             ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.GLOWING,
-                    20, 1, false, false, true));
+                    20, 0, false, false, true));
             if (entity instanceof Player) {
-                ((Player) entity).playSound(player.getLocation(), "block.enchantment_table.use", 1f, 1.5f);
+                ((Player) entity).playSound(player.getLocation(), "block.enchantment_table.use", SoundCategory.PLAYERS, 1f, 1.5f);
             }
         });
         player.setCooldown(radarTemplate.getType(), 80);
         //We need an extra call to playSound because getNearbyEntities doesn't include the calling player
-        player.playSound(player.getLocation(), "block.enchantment_table.use", 1f, 1.5f);
+        player.playSound(player.getLocation(), "block.enchantment_table.use", SoundCategory.PLAYERS, 1f, 1.5f);
         player.spawnParticle(Particle.SPELL_INSTANT, player.getLocation(), 25);
     }
 }

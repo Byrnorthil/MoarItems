@@ -3,6 +3,9 @@ package com.github.byrnorthil.moaritems;
 import com.github.byrnorthil.moaritems.commands.MoarItemsCommandExecutor;
 import com.github.byrnorthil.moaritems.listeners.MoarItemsListener;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Color;
+import org.bukkit.DyeColor;
+import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
@@ -41,6 +44,8 @@ public final class MoarItems extends JavaPlugin {
         FireworkMeta chargeMeta = (FireworkMeta) glitterBomb.getItemMeta();
         chargeMeta.displayName(Component.text(GLITTER_BOMB_NAME));
         chargeMeta.lore(List.of(Component.text(GLITTER_BOMB_DESC_1)));
+        chargeMeta.addEffects(FireworkEffect.builder().with(FireworkEffect.Type.STAR).withColor(DyeColor.WHITE.getFireworkColor()).withFlicker().build(),
+                FireworkEffect.builder().with(FireworkEffect.Type.BURST).withColor(DyeColor.GRAY.getFireworkColor()).withTrail().build());
         chargeMeta.setPower(2);
         glitterBomb.setItemMeta(chargeMeta);
         return glitterBomb;
