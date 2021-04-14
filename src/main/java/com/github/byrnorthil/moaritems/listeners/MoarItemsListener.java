@@ -50,9 +50,9 @@ public class MoarItemsListener implements Listener {
         ItemStack radarTemplate = makeRadar();
         Player player = event.getPlayer();
         if (!(event.getAction() == Action.RIGHT_CLICK_AIR
-                || (event.getAction() == Action.RIGHT_CLICK_BLOCK
-                    && event.getClickedBlock() != null
-                    && event.getClickedBlock().getType().isInteractable()))
+                || event.getAction() == Action.RIGHT_CLICK_BLOCK
+                    && event.hasBlock()
+                    && event.getClickedBlock().getType().isInteractable())
                 || player.hasCooldown(radarTemplate.getType())
                 || player.isHandRaised()) return;
 
