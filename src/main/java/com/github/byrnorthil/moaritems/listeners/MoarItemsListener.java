@@ -1,5 +1,6 @@
 package com.github.byrnorthil.moaritems.listeners;
 
+import com.destroystokyo.paper.MaterialTags;
 import org.bukkit.Particle;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Firework;
@@ -61,6 +62,7 @@ public class MoarItemsListener implements Listener {
         if (item == null || !metaMatch(radarTemplate.getItemMeta(), item.getItemMeta())) return;
 
         if (event.getHand() == EquipmentSlot.HAND) {
+            if (isUsableItem(player.getItemInOffHand())) return;
             player.swingMainHand();
         } else {
             player.swingOffHand();
@@ -82,5 +84,13 @@ public class MoarItemsListener implements Listener {
         //We need an extra call to playSound because getNearbyEntities doesn't include the calling player
         player.playSound(player.getLocation(), "block.enchantment_table.use", SoundCategory.PLAYERS, 1f, 1.5f);
         player.spawnParticle(Particle.SPELL_INSTANT, player.getLocation(), 25);
+    }
+    
+    private boolean isUsableItem(ItemStack item) {
+        return item.getType().isEdible()
+                || MaterialTags.BOWS.isTagged(item)
+                || MaterialTags.THROWABLE_PROJECTILES.isTagged(item)
+                || item.getType() == Material.SHIELD
+                || item.getType() == Material.FISHING_ROD;
     }
 }
