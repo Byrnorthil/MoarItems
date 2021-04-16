@@ -1,6 +1,7 @@
 package com.github.byrnorthil.moaritems.listeners;
 
 import com.destroystokyo.paper.MaterialTags;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Firework;
@@ -52,8 +53,7 @@ public class MoarItemsListener implements Listener {
         Player player = event.getPlayer();
         if (!(event.getAction() == Action.RIGHT_CLICK_AIR
                 || event.getAction() == Action.RIGHT_CLICK_BLOCK
-                    && event.hasBlock()
-                    && event.getClickedBlock().getType().isInteractable())
+                    && !event.getClickedBlock().getType().isInteractable())
                 || player.hasCooldown(radarTemplate.getType())
                 || player.isHandRaised()) return;
 
@@ -62,13 +62,13 @@ public class MoarItemsListener implements Listener {
         if (item == null || !metaMatch(radarTemplate.getItemMeta(), item.getItemMeta())) return;
 
         if (event.getHand() == EquipmentSlot.HAND) {
-            if (isUsableItem(player.getItemInOffHand())) return;
+            //Can't override client-side animation D:
+            if (isUsableItem(player.getInventory().getItemInOffHand())) return;
             player.swingMainHand();
         } else {
             player.swingOffHand();
         }
 
-        //TODO: Find some way to override off-hand item if radar is used in main hand
         event.setUseItemInHand(Event.Result.ALLOW);
 
         //Give glowing and play sound
