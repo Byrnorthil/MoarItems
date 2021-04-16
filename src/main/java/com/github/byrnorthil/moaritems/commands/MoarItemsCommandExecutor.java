@@ -33,7 +33,7 @@ public class MoarItemsCommandExecutor implements CommandExecutor {
                 if (targetS != null) targetS.getInventory().addItem(makeGlitterBomb());
                 else commandSender.sendMessage(INVALID_TARGET);
                 return true;
-            case "giveradar":
+            case "givesonar":
                 if (strings.length > 1) {
                     return false;
                 }

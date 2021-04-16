@@ -69,13 +69,26 @@ public class MoarItemsListener implements Listener {
             player.swingOffHand();
         }
 
+        //check for crystals
+        int ammoIndex = player.getInventory().first(Material.PRISMARINE_CRYSTALS);
+        if (ammoIndex != -1) {
+            ItemStack ammo = player.getInventory().getItem(ammoIndex);
+            if (!ammo.getItemMeta().hasLore()) {
+                ammo.subtract();
+            } else {
+                return;
+            }
+        } else {
+            return;
+        }
+
         event.setUseItemInHand(Event.Result.ALLOW);
 
         //Give glowing and play sound
         player.getNearbyEntities(48, 48, 48).stream()
                 .filter(entity -> entity instanceof LivingEntity).forEach(entity -> {
             ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.GLOWING,
-                    20, 0, false, false, true));
+                    60, 0, false, false, true));
             if (entity instanceof Player) {
                 ((Player) entity).playSound(player.getLocation(), "block.enchantment_table.use", SoundCategory.PLAYERS, 1f, 1.5f);
             }

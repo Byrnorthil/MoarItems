@@ -20,10 +20,13 @@ public final class MoarItems extends JavaPlugin {
 
     //Constants
     public static final String GLITTER_BOMB_NAME = "Glitter Bomb";
-    public static final String GLITTER_BOMB_DESC_1 = "Illuminates everything within a large area";
+    public static final List<Component> GLITTER_BOMB_DESC = List.of(
+            Component.text("Illuminates everything within a large area"));
 
-    public static final String RADAR_NAME = "Radar";
-    public static final String RADAR_DESC = "Right-click to reveal nearby entities";
+    public static final String RADAR_NAME = "Sonar";
+    public static final List<Component> RADAR_DESC = List.of(
+            Component.text("Right-click to reveal nearby entities"),
+            Component.text("Consumes prismarine crystals"));
 
     @Override
     public void onEnable() {
@@ -31,7 +34,7 @@ public final class MoarItems extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new MoarItemsListener(), this);
         MoarItemsCommandExecutor commandExecutor = new MoarItemsCommandExecutor(this);
         getCommand("giveglitterbomb").setExecutor(commandExecutor);
-        getCommand("giveradar").setExecutor(commandExecutor);
+        getCommand("givesonar").setExecutor(commandExecutor);
     }
 
     @Override
@@ -43,7 +46,7 @@ public final class MoarItems extends JavaPlugin {
         ItemStack glitterBomb = new ItemStack(Material.FIREWORK_ROCKET);
         FireworkMeta chargeMeta = (FireworkMeta) glitterBomb.getItemMeta();
         chargeMeta.displayName(Component.text(GLITTER_BOMB_NAME));
-        chargeMeta.lore(List.of(Component.text(GLITTER_BOMB_DESC_1)));
+        chargeMeta.lore(GLITTER_BOMB_DESC);
         chargeMeta.addEffects(FireworkEffect.builder().with(FireworkEffect.Type.STAR).withColor(DyeColor.WHITE.getFireworkColor()).withFlicker().build(),
                 FireworkEffect.builder().with(FireworkEffect.Type.BURST).withColor(DyeColor.GRAY.getFireworkColor()).withTrail().build());
         chargeMeta.setPower(2);
@@ -55,7 +58,7 @@ public final class MoarItems extends JavaPlugin {
         ItemStack radar = new ItemStack(Material.CLOCK);
         ItemMeta meta = radar.getItemMeta();
         meta.displayName(Component.text(RADAR_NAME));
-        meta.lore(List.of(Component.text(RADAR_DESC)));
+        meta.lore(RADAR_DESC);
         radar.setItemMeta(meta);
         return radar;
     }
